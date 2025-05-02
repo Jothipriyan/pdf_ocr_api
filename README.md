@@ -1,8 +1,11 @@
 # pdf_ocr_api
 
 🚀 Features
+
 ✅ Extract text from PDFs (both digital and scanned)
+
 ✅ Accurate OCR using Tesseract
+
 ✅ Structured JSON response:
 
 Page count
@@ -10,11 +13,14 @@ Page count
 Total extracted text count
 
 Per-page extracted text
+
 ✅ Robust error handling
+
 ✅ Swagger UI documentation at /docs
 
 
 📦 Requirements
+
 Python 3.8+
 
 Tesseract OCR installed
@@ -24,13 +30,12 @@ Poppler installed (for pdf2image)
 
 
 ▶ Running the API
+
 **uvicorn main:app --reload**
 
 
 Success JSON Response
-json
-Copy
-Edit
+
 {
   "page_count": 5,
   "text_count": 2345,
