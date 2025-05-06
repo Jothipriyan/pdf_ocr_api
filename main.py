@@ -7,36 +7,34 @@ import io
 app = FastAPI(title="PDF OCR API")
 
 @app.post("/extract-pdf")
-async def extract_pdf(file: UploadFile = File(...)):
+
+async def extract_pdf(file: UploadFile = File()):
     if not file.filename.endswith(".pdf"):
         raise HTTPException(status_code=400, detail="Only PDF files are supported.")
 
-    try:
-        content = await file.read()
-        reader = PdfReader(io.BytesIO(content))
-        page_count = len(reader.pages)
 
-        ocr_data = []
-        total_text_length = 0
+    content = await file.read()
+    reader = PdfReader(io.BytesIO(content))
+    page_count = len(reader.pages)
 
-        for idx, page in enumerate(reader.pages, start=1):
-            text = page.extract_text()
-            if not text or len(text.strip()) == 0:
-                # fallback to OCR on image
-                images = convert_from_bytes(content, first_page=idx, last_page=idx)
-                ocr_text = ""
-                for image in images:
-                    ocr_text += pytesseract.image_to_string(image)
-                text = ocr_text
+    ocr_data = []
+    total_text_length = 0
 
-            ocr_data.append({"page_number": idx, "text": text})
-            total_text_length += len(text)
+    for idx, page in enumerate(reader.pages, start=1):
+        text = page.extract_text()
+        if not text or len(text.strip()) == 0:
+            # fallback to OCR on image
+            images = convert_from_bytes(content, first_page=idx, last_page=idx,poppler_path=r'C:\Program Files (x86)\poppler-24.07.0\Library\bin')
+            ocr_text = ""
+            for image in images:
+                ocr_text += pytesseract.image_to_string(image)
+            text = ocr_text
+
+        ocr_data.append({"page_number": idx, "text": text})
+        total_text_length += len(text)
 
         return {
             "page_count": page_count,
             "text_count": total_text_length,
             "ocr_data": ocr_data
         }
-
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Processing failed: {str(e)}")
